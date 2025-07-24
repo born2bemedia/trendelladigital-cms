@@ -55,9 +55,9 @@ export const Users: CollectionConfig = {
       required: false,
     },
     {
-      name: 'state',
+      name: 'apartment',
       type: 'text',
-      label: 'State',
+      label: 'Apartment',
       required: false,
     },
     {

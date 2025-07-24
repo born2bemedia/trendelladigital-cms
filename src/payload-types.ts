@@ -134,7 +134,7 @@ export interface User {
   street?: string | null;
   address?: string | null;
   city?: string | null;
-  state?: string | null;
+  apartment?: string | null;
   zip?: string | null;
   country?: string | null;
   role: 'admin' | 'customer';
@@ -337,7 +337,7 @@ export interface UsersSelect<T extends boolean = true> {
   street?: T;
   address?: T;
   city?: T;
-  state?: T;
+  apartment?: T;
   zip?: T;
   country?: T;
   role?: T;
