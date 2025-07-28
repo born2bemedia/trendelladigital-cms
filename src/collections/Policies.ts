@@ -24,6 +24,18 @@ export const Policies: CollectionConfig = {
       type: 'text',
       label: 'Slug',
       unique: true,
+      admin: {
+        position: 'sidebar',
+      },
+    },
+    {
+      name: 'lastUpdate',
+      type: 'date',
+      label: 'Last Update',
+      defaultValue: new Date(),
+      admin: {
+        position: 'sidebar',
+      },
     },
     {
       name: 'content',
