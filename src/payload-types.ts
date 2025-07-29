@@ -74,6 +74,7 @@ export interface Config {
     packages: Package;
     orders: Order;
     policies: Policy;
+    posts: Post;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -87,6 +88,7 @@ export interface Config {
     packages: PackagesSelect<false> | PackagesSelect<true>;
     orders: OrdersSelect<false> | OrdersSelect<true>;
     policies: PoliciesSelect<false> | PoliciesSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -283,6 +285,32 @@ export interface Policy {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  slug?: string | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -315,6 +343,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'policies';
         value: number | Policy;
+      } | null)
+    | ({
+        relationTo: 'posts';
+        value: number | Post;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -492,6 +524,17 @@ export interface PoliciesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   lastUpdate?: T;
+  content?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
   content?: T;
   updatedAt?: T;
   createdAt?: T;

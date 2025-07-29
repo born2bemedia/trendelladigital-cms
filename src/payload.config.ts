@@ -15,6 +15,7 @@ import { Packages } from './collections/Packages'
 import Orders from './collections/Orders'
 import { Policies } from './collections/Policies'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
+import { Posts } from './collections/Posts'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -26,7 +27,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media, Products, Groups, Packages, Orders, Policies],
+  collections: [Users, Media, Products, Groups, Packages, Orders, Policies, Posts],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
