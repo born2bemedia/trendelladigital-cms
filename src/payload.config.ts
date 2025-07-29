@@ -14,6 +14,7 @@ import { Groups } from './collections/Groups'
 import { Packages } from './collections/Packages'
 import Orders from './collections/Orders'
 import { Policies } from './collections/Policies'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -61,4 +62,16 @@ export default buildConfig({
       },
     }),
   ],
+  email: nodemailerAdapter({
+    defaultFromName: 'Trendella',
+    defaultFromAddress: 'noreply@trendella.com',
+    transportOptions: {
+      host: 'smtp.sendgrid.net',
+      port: 587,
+      auth: {
+        user: 'apikey',
+        pass: process.env.SENDGRID_API_KEY,
+      },
+    },
+  }),
 })
