@@ -21,6 +21,7 @@ export const Packages: CollectionConfig = {
     {
       name: 'description',
       type: 'text',
+      localized: true,
     },
     {
       name: 'slug',
