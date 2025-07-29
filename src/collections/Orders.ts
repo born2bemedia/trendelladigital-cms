@@ -1,5 +1,10 @@
 import type { CollectionConfig } from 'payload'
 
+import sgMail from '@sendgrid/mail'
+import { paymentReceivedBody } from '@/features/request-form-body'
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY ?? '')
+
 export const Orders: CollectionConfig = {
   slug: 'orders',
   admin: {
@@ -127,6 +132,28 @@ export const Orders: CollectionConfig = {
     beforeChange: [
       ({ data, req }) => {
         console.log('Incoming data:', data)
+      },
+    ],
+    afterChange: [
+      async ({ doc, previousDoc }) => {
+        const statusChanged = doc.status !== previousDoc?.status
+        const isCompleted = doc.status === 'completed'
+
+        if (statusChanged && isCompleted && doc.billingAddress?.email) {
+          try {
+            await sgMail.send({
+              to: doc.billingAddress.email,
+              from: process.env.FROM_EMAIL || 'noreply@trendelladigital.com',
+              subject: 'Payment Received — Let’s Begin Your Strategy',
+              html: paymentReceivedBody({
+                username: doc.billingAddress.firstName,
+                orderNumber: doc.orderNumber,
+              }),
+            })
+          } catch (err) {
+            console.error('Failed to send email:', err)
+          }
+        }
       },
     ],
   },
