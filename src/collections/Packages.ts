@@ -16,6 +16,7 @@ export const Packages: CollectionConfig = {
       name: 'name',
       type: 'text',
       required: true,
+      localized: true,
     },
     {
       name: 'description',
