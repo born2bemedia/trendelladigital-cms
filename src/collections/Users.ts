@@ -13,13 +13,13 @@ export const Users: CollectionConfig = {
   auth: {
     forgotPassword: {
       generateEmailHTML: (args?: { token?: string }) => {
-        const resetLink = `https://your-frontend-domain.com/reset-password?token=${args?.token}`
+        const resetLink = `https://trendelladigital.com/reset-password?token=${args?.token}`
 
         return `
           <div style="font-family: sans-serif; line-height: 1.5;">
             <h2>Password Reset Request</h2>
             <p>You requested a password reset. Click the button below to reset your password.</p>
-            <p><a href="${resetLink}" style="display: inline-block; background-color: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px;">Reset Password</a></p>
+            <p><a href="${resetLink}" style="display: inline-block; background-color: white; color: black; padding: 16px 24px; text-decoration: none; border: 1px solid black;">Reset Password</a></p>
             <p>If you didn’t request this, just ignore this email.</p>
           </div>
         `
