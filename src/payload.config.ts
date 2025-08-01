@@ -65,7 +65,7 @@ export default buildConfig({
   ],
   email: nodemailerAdapter({
     defaultFromName: 'Trendella',
-    defaultFromAddress: 'noreply@trendella.com',
+    defaultFromAddress: 'noreply@trendelladigital.com',
     transportOptions: {
       apiKey: process.env.SENDGRID_API_KEY ?? '',
     },
