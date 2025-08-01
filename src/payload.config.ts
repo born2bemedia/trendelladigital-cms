@@ -67,12 +67,7 @@ export default buildConfig({
     defaultFromName: 'Trendella',
     defaultFromAddress: 'noreply@trendella.com',
     transportOptions: {
-      host: 'smtp.sendgrid.net',
-      port: 587,
-      auth: {
-        user: 'apikey',
-        pass: process.env.SENDGRID_API_KEY,
-      },
+      apiKey: process.env.SENDGRID_API_KEY ?? '',
     },
   }),
 })
