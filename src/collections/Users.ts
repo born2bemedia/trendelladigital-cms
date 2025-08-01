@@ -13,7 +13,7 @@ export const Users: CollectionConfig = {
   auth: {
     forgotPassword: {
       generateEmailHTML: (args?: { token?: string }) => {
-        const resetLink = `https://trendelladigital.com/reset-password?token=${args?.token}`
+        const resetLink = `https://trendelladigital.com/forgot-password?token=${args?.token}`
 
         return `
           <div style="font-family: sans-serif; line-height: 1.5;">
