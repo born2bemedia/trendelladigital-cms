@@ -7,6 +7,7 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 import nodemailerSendgrid from 'nodemailer-sendgrid'
+import { deeplTranslatorPlugin } from './deepl-translator'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -62,6 +63,11 @@ export default buildConfig({
         region: process.env.S3_REGION || '',
         endpoint: process.env.S3_ENDPOINT || '',
       },
+    }),
+    deeplTranslatorPlugin({
+      enabled: true,
+      fallbackLocales: ['de', 'it'],
+      collections: { policies: { fields: ['title', 'content'] } },
     }),
   ],
   email: nodemailerAdapter({
