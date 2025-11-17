@@ -42,7 +42,7 @@ export default buildConfig({
   }),
   sharp,
   localization: {
-    locales: ['en', 'it', 'de'],
+    locales: ['en', 'it', 'de', 'ro'],
     defaultLocale: 'en',
   },
   plugins: [
@@ -66,8 +66,14 @@ export default buildConfig({
     }),
     deeplTranslatorPlugin({
       enabled: true,
-      fallbackLocales: ['de', 'it'],
-      collections: { policies: { fields: ['title', 'content'] } },
+      fallbackLocales: ['de', 'it', 'ro'],
+      collections: {
+        policies: { fields: ['title', 'content'] },
+        posts: { fields: ['title', 'content'] },
+        groups: { fields: ['name'] },
+        products: { fields: ['name'] },
+        packages: { fields: ['name', 'description'] },
+      },
     }),
   ],
   email: nodemailerAdapter({
