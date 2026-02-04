@@ -7,8 +7,10 @@ const Translator: React.FC = () => {
   const { id } = useDocumentInfo()
   const locale = useLocale()
   const config: any = useConfig()
-  const [isTranslating, setIsTranslating] = useState(false)
-  const [status, setStatus] = useState('')
+  const [translatingStates, setTranslatingStates] = useState<Record<string, boolean>>({})
+  const [statuses, setStatuses] = useState<Record<string, string>>({})
+  const [isTranslatingAll, setIsTranslatingAll] = useState(false)
+  const [statusAll, setStatusAll] = useState('')
   const [fallbackLocales, setFallbackLocales] = useState<string[]>(['en'])
 
   // Get fallback locales from global config on component mount
@@ -107,14 +109,79 @@ const Translator: React.FC = () => {
     }
   }
 
-  const handleTranslate = async () => {
+  const handleTranslate = async (targetLanguage: string) => {
     if (!id) {
-      setStatus('No document ID found')
+      setStatuses((prev) => ({
+        ...prev,
+        [targetLanguage]: 'No document ID found',
+      }))
       return
     }
 
-    setIsTranslating(true)
-    setStatus('Translating...')
+    setTranslatingStates((prev) => ({
+      ...prev,
+      [targetLanguage]: true,
+    }))
+    setStatuses((prev) => ({
+      ...prev,
+      [targetLanguage]: 'Translating...',
+    }))
+
+    try {
+      const collectionSlug = getCollectionSlug()
+      console.log('Using collection slug:', collectionSlug)
+
+      const response = await fetch(`/api/collections/${collectionSlug}/translate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: id,
+          locale: 'en', // Source language is always English
+          codes: [targetLanguage], // Translate to single target language
+          settings: {},
+          collectionSlug: collectionSlug, // Pass collection slug in body as fallback
+        }),
+      })
+
+      if (response.ok) {
+        setStatuses((prev) => ({
+          ...prev,
+          [targetLanguage]: `Translation to ${targetLanguage.toUpperCase()} completed successfully!`,
+        }))
+        // Refresh the page to show updated translations
+        setTimeout(() => {
+          window.location.reload()
+        }, 1000)
+      } else {
+        const error = await response.json()
+        setStatuses((prev) => ({
+          ...prev,
+          [targetLanguage]: `Translation failed: ${error.message || 'Unknown error'}`,
+        }))
+      }
+    } catch (error) {
+      setStatuses((prev) => ({
+        ...prev,
+        [targetLanguage]: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      }))
+    } finally {
+      setTranslatingStates((prev) => ({
+        ...prev,
+        [targetLanguage]: false,
+      }))
+    }
+  }
+
+  const handleTranslateAll = async () => {
+    if (!id) {
+      setStatusAll('No document ID found')
+      return
+    }
+
+    setIsTranslatingAll(true)
+    setStatusAll('Translating...')
 
     try {
       const collectionSlug = getCollectionSlug()
@@ -135,7 +202,7 @@ const Translator: React.FC = () => {
       })
 
       if (response.ok) {
-        setStatus(
+        setStatusAll(
           `Translation completed successfully! Document translated to: ${targetLanguages.join(', ').toUpperCase()}`,
         )
         // Refresh the page to show updated translations
@@ -144,50 +211,113 @@ const Translator: React.FC = () => {
         }, 1000)
       } else {
         const error = await response.json()
-        setStatus(`Translation failed: ${error.message || 'Unknown error'}`)
+        setStatusAll(`Translation failed: ${error.message || 'Unknown error'}`)
       }
     } catch (error) {
-      setStatus(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      setStatusAll(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
-      setIsTranslating(false)
+      setIsTranslatingAll(false)
     }
   }
 
   return (
     <div className="field-type">
-      <div className="field-input">
-        <button
-          type="button"
-          onClick={handleTranslate}
-          disabled={isTranslating}
-          className="btn btn--style-primary"
-          style={{
-            backgroundColor: isTranslating ? '#6c757d' : '#007cba',
-            color: 'white',
-            border: 'none',
-            padding: '8px 16px',
-            borderRadius: '4px',
-            cursor: isTranslating ? 'not-allowed' : 'pointer',
-          }}
-        >
-          {isTranslating
-            ? 'Translating...'
-            : `Translate to All Languages (${targetLanguages.join(', ').toUpperCase()})`}
-        </button>
-        {status && (
-          <div
+      <div
+        className="field-input"
+        style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
+      >
+        {/* Button to translate all languages at once */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <button
+            type="button"
+            onClick={handleTranslateAll}
+            disabled={isTranslatingAll}
+            className="btn btn--style-primary"
             style={{
-              marginTop: '8px',
-              padding: '8px',
+              backgroundColor: isTranslatingAll ? '#6c757d' : '#007cba',
+              color: 'white',
+              border: 'none',
+              padding: '8px 16px',
               borderRadius: '4px',
-              backgroundColor: status.includes('successfully') ? '#d4edda' : '#f8d7da',
-              color: status.includes('successfully') ? '#155724' : '#721c24',
-              border: `1px solid ${status.includes('successfully') ? '#c3e6cb' : '#f5c6cb'}`,
+              cursor: isTranslatingAll ? 'not-allowed' : 'pointer',
+              width: '100%',
+              fontWeight: 'bold',
             }}
           >
-            {status}
-          </div>
-        )}
+            {isTranslatingAll
+              ? 'Translating...'
+              : `Translate to All Languages (${targetLanguages.join(', ').toUpperCase()})`}
+          </button>
+          {statusAll && (
+            <div
+              style={{
+                padding: '8px',
+                borderRadius: '4px',
+                backgroundColor: statusAll.includes('successfully') ? '#d4edda' : '#f8d7da',
+                color: statusAll.includes('successfully') ? '#155724' : '#721c24',
+                border: `1px solid ${statusAll.includes('successfully') ? '#c3e6cb' : '#f5c6cb'}`,
+                fontSize: '12px',
+              }}
+            >
+              {statusAll}
+            </div>
+          )}
+        </div>
+
+        {/* Divider */}
+        <div
+          style={{
+            borderTop: '1px solid #e0e0e0',
+            margin: '8px 0',
+          }}
+        />
+
+        {/* Individual translation buttons for each language */}
+        {targetLanguages.map((targetLanguage: string) => {
+          const isTranslating = translatingStates[targetLanguage] || false
+          const status = statuses[targetLanguage] || ''
+
+          return (
+            <div
+              key={targetLanguage}
+              style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}
+            >
+              <button
+                type="button"
+                onClick={() => handleTranslate(targetLanguage)}
+                disabled={isTranslating || isTranslatingAll}
+                className="btn btn--style-primary"
+                style={{
+                  backgroundColor: isTranslating || isTranslatingAll ? '#6c757d' : '#007cba',
+                  color: 'white',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '4px',
+                  cursor: isTranslating || isTranslatingAll ? 'not-allowed' : 'pointer',
+                  width: '100%',
+                }}
+              >
+                {isTranslating
+                  ? `Translating to ${targetLanguage.toUpperCase()}...`
+                  : `Translate to ${targetLanguage.toUpperCase()}`}
+              </button>
+              {status && (
+                <div
+                  style={{
+                    padding: '8px',
+                    borderRadius: '4px',
+                    backgroundColor: status.includes('successfully') ? '#d4edda' : '#f8d7da',
+                    color: status.includes('successfully') ? '#155724' : '#721c24',
+                    border: `1px solid ${status.includes('successfully') ? '#c3e6cb' : '#f5c6cb'}`,
+                    fontSize: '12px',
+                  }}
+                >
+                  {status}
+                </div>
+              )}
+            </div>
+          )
+        })}
       </div>
     </div>
   )
